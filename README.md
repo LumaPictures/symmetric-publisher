@@ -22,6 +22,8 @@ Changes are published to JMS in the following XML format:
 2. Copy the jar to `<symmetricds_install_dir>/lib`
 3. Edit `<symmetricds_install_dir>/conf/symmetric-extensions.xml`
 
+... 
+
     <bean id="mqPublisher" class="com.lumapictures.symmetric.integrate.QueueTriggeringDataRouter">
         <property name="publisher">
             <bean class="org.jumpmind.symmetric.integrate.SimpleJmsPublisher">
