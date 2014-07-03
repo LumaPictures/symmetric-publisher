@@ -88,6 +88,7 @@
     <orderEntry type="library" scope="PROVIDED" name="Maven: net.java.dev.jna:jna:4.1.0" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: net.java.dev.jna:jna-platform:4.1.0" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: junit:junit:4.7" level="project" />
+    <orderEntry type="library" scope="TEST" name="Maven: org.mockito:mockito-all:1.9.5" level="project" />
     <orderEntry type="library" scope="TEST" name="Maven: org.springframework:spring-test:4.0.5.RELEASE" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: javax.jms:jms-api:1.1-rev-1" level="project" />
     <orderEntry type="library" scope="PROVIDED" name="Maven: mx4j:mx4j-tools:3.0.1" level="project" />
