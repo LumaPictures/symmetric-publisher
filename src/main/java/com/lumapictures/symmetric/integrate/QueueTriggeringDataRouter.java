@@ -2,6 +2,7 @@ package com.lumapictures.symmetric.integrate;
 
 import org.jdom.Document;
 import org.jdom.Element;
+import org.jdom.Namespace;
 import org.jdom.output.Format;
 import org.jdom.output.XMLOutputter;
 import org.jumpmind.extension.IExtensionPoint;
@@ -35,6 +36,10 @@ public class QueueTriggeringDataRouter implements
     public QueueTriggeringDataRouter() {
         xmlFormat = Format.getCompactFormat();
         xmlFormat.setOmitDeclaration(true);
+    }
+
+    protected final static Namespace getXmlNamespace() {
+        return Namespace.getNamespace("xsi", "http://www.w3.org/2001/XMLSchema-instance");
     }
 
     public void setPublisher(IPublisher publisher) {
@@ -166,6 +171,30 @@ public class QueueTriggeringDataRouter implements
             column.setText( String.valueOf(primaryKeyVal[i]) );
         }
 
+        // Old values
+        Element old = new Element("old");
+        change.addContent(old);
+
+        String[] oldData = data.toParsedOldData();
+        String[] colNames = null, parsedData = null;
+        if (oldData == null) {
+            colNames = history.getParsedPkColumnNames();
+            oldData = data.toParsedPkData();
+        } else {
+            colNames = history.getParsedColumnNames();
+        }
+
+        for (int i = 0; i < oldData.length; i++) {
+            String col = colNames[i];
+            Element dataElement = new Element("column");
+            old.addContent(dataElement);
+            dataElement.setAttribute("key", col);
+            if (oldData[i] != null)
+                dataElement.setText(oldData[i]);
+            else
+                dataElement.setAttribute("nil", "true", getXmlNamespace());
+        }
+
         return change;
     }
 
@@ -202,6 +231,7 @@ public class QueueTriggeringDataRouter implements
      */
     protected synchronized void publishChanges(Context context) {
         Element root = new Element("changes");
+        root.addNamespaceDeclaration(getXmlNamespace());
 
         List<Element> changes = getChanges(context);
         int numChanges = changes.size();
