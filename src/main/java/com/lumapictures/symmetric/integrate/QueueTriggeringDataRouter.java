@@ -11,6 +11,7 @@ import org.jumpmind.symmetric.ext.INodeGroupExtensionPoint;
 import org.jumpmind.symmetric.ext.ISymmetricEngineAware;
 import org.jumpmind.symmetric.integrate.IPublisher;
 import org.jumpmind.symmetric.model.*;
+import org.jumpmind.symmetric.route.AbstractDataRouter;
 import org.jumpmind.symmetric.route.IDataRouter;
 import org.jumpmind.symmetric.route.SimpleRouterContext;
 import org.jumpmind.util.Context;
@@ -19,8 +20,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class QueueTriggeringDataRouter implements
-        IDataRouter, IExtensionPoint, INodeGroupExtensionPoint, ISymmetricEngineAware {
+public class QueueTriggeringDataRouter
+        extends AbstractDataRouter
+        implements IDataRouter, IExtensionPoint, INodeGroupExtensionPoint, ISymmetricEngineAware {
 
     protected final String CHANGE_CACHE = "XML_CHANGE_CACHE_" + this.hashCode();
 
@@ -99,6 +101,7 @@ public class QueueTriggeringDataRouter implements
             changes.add(change);
         }
 
+        //return toNodeIds(nodes, null);
         return Collections.emptySet();
     }
 
@@ -111,7 +114,7 @@ public class QueueTriggeringDataRouter implements
      */
     @Override
     public void completeBatch(SimpleRouterContext context, OutgoingBatch batch) {
-        log.info("completeBatch() called");
+        //log.info("completeBatch() called");
         if (onePerBatch && hasChanges(context))
             publishChanges(context);
     }
@@ -125,7 +128,7 @@ public class QueueTriggeringDataRouter implements
      */
     @Override
     public void contextCommitted(SimpleRouterContext context) {
-        log.info("contextCommitted() called");
+        //log.info("contextCommitted() called");
         if (hasChanges(context))
             publishChanges(context);
     }
@@ -242,7 +245,7 @@ public class QueueTriggeringDataRouter implements
         root.addContent(changes);
 
         String xml = new XMLOutputter(xmlFormat).outputString(new Document(root));
-        log.debug("Publishing change batch: {}", xml);
+        log.debug("Publishing batch with {} changes", numChanges);
         publisher.publish(context, xml);
 
         changes.clear();
