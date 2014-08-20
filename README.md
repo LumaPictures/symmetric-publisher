@@ -1,17 +1,21 @@
 # SymmetricDS Publisher
 
-Custom SymmetricDS router that publishes database change batches to a JMS queue, containing the table, database, schema,
-and primary key of the row that changed. This is used for triggering a queue worker which will then re-read the model 
-from the database using SqlAlchemy, serialize it to JSON, and cache it in MongoDB.
+This is a custom SymmetricDS router that publishes all changes to a message queue. We have some Python queue workers that will then operate on the data to transform and store it in various ways.
 
-Changes are published to JMS in the following XML format:
+Changes are published in the following XML format:
 
     <changes count="1">
         <change type="U">
+            <database>somedb</database>
             <table>users</table>
             <key>
-                <column name="id">chrisl</column>
+                <column name="id">chris</column>
             </key>
+            <old>
+                <column name="id">chris</column>
+                <column name="first_name">Chris</column>
+                <column name="last_name">Lyon</column>
+            </old>
         </change>
         ...
     </changes>
@@ -20,9 +24,9 @@ Changes are published to JMS in the following XML format:
 
 1. Run `mvn package` to build the jar file.
 2. Copy the jar to `<symmetricds_install_dir>/lib`
-3. Edit `<symmetricds_install_dir>/conf/symmetric-extensions.xml`
+3. Edit `<symmetricds_install_dir>/conf/symmetric-extensions.xml` and configure the Spring beans.
 
-... 
+Here's an example Spring bean configuration that wires symmetric-publisher to an ActiveMQ message queue:
 
     <bean id="mqPublisher" class="com.lumapictures.symmetric.integrate.QueueTriggeringDataRouter">
         <property name="publisher">
@@ -34,7 +38,6 @@ Changes are published to JMS in the following XML format:
         <property name="nodeGroups">
             <list>
                 <value>NODE_NAME_GOES_HERE</value>
-                <value>...</value>
             </list>
         </property>
     </bean>
